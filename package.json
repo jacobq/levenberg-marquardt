@@ -49,6 +49,10 @@
     "rollup": "^0.66.6"
   },
   "dependencies": {
-    "ml-matrix": "^5.2.0"
+    "ml-matrix": "^5.2.0",
+    "norm-dist": "^2.0.1"
+  },
+  "jest": {
+    "testURL": "http://localhost"
   }
 }
