@@ -54,15 +54,23 @@ test('bennet5 problem', () => {
 
 test('fourParamEq', () => {
   const options = {
-    damping: 0.00001,
+    damping: 0.001,
     maxIterations: 200,
+    minValues: [-Infinity, -Infinity, 0, -Infinity],
     initialValues: [0, 100, 1, 0.1]
   };
 
+  // TODO: Document where these values come from / why they are correct
   expect(levenbergMarquardt(data, fourParamEq, options)).toBeDeepCloseTo({
-    iterations: 200,
-    residuals: 16398.0009,
-    parameterValues: [-16.7697, 43.4549, 1018.8938, -4.3514]
+    parameterValues: [
+      -31.796746265972978,
+      143.170298900432,
+      0.000001983487779732099,
+      0.2744342546252607
+    ],
+    residuals: 6810.461467877944,
+    iterations: 10,
+    parameterError: 6810.461467877944
   }, 3);
 });
 
@@ -75,9 +83,9 @@ test('error is NaN', () => {
     // c < 0 && d is not an integer so Math.pow(c, d) is NaN
   };
 
-  expect(levenbergMarquardt(data, fourParamEq, options)).toBeDeepCloseTo({
-    iterations: 10,
-    residuals: NaN,
-    parameterValues: [-64.298, 117.4022, -47.0851, -0.06148]
-  }, 3);
+  try {
+    levenbergMarquardt(data, fourParamEq, options);
+  } catch (e) {
+    expect(e.message).toMatch('The function evaluated to NaN.');
+  }
 });

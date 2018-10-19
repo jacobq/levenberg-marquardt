@@ -97,16 +97,17 @@ export default function levenbergMarquardt(
       paramFunction
     );
 
+    // limit parameters to be within bounds set by minValues & maxValues
     for (let k = 0; k < parLen; k++) {
-      params[k] = Math.min(
-        Math.max(minValues[k], params[k]),
+      params2[k] = Math.min(
+        Math.max(minValues[k], params2[k]),
         maxValues[k]
       );
     }
 
     let residuals2 = sumOfSquaredResiduals(data, params2, paramFunction);
 
-    if (isNaN(residuals2)) throw new Error('The function evaluates to NaN.');
+    if (isNaN(residuals2)) throw new Error(`The function evaluated to NaN.\r\n  f = ${paramFunction(params2).toString()}\r\n  p = ${params2}\r\n  x = ${data.x}`);
 
     if (residuals2 < residuals) {
       params = params2;
