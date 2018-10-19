@@ -1,16 +1,11 @@
 import { toBeDeepCloseTo } from 'jest-matcher-deep-close-to';
 
 import levenbergMarquardt from '..';
-import * as errCalc from "../errorCalculation";
 
 expect.extend({ toBeDeepCloseTo });
 
 function fourParamEq([a, b, c, d]) {
   return (t) => a + (b - a) / (1 + Math.pow(c, d) * Math.pow(t, -d));
-}
-
-function bennet5([b1, b2, b3]) {
-  return (t) => b1 * Math.pow(t + b2, -1 / b3);
 }
 
 const data = {
@@ -28,18 +23,6 @@ const data = {
   ],
   y: [7.807, -3.74, 21.119, 2.382, 4.269, 41.57, 73.401, 98.535, 97.059, 92.147]
 };
-
-const bennett5Parameter = [2, 3, 5];
-let bennet5Func = bennet5(bennett5Parameter);
-let bennet5XData = new Array(154).fill(0).map((_, i) => -3 + (i + 1) * 0.3419);
-let bennett5YData = bennet5XData.map((e) => bennet5Func(e));
-
-const bennet5Data = {
-  x: bennet5XData,
-  y: bennett5YData
-};
-
-
 
 describe('Example problems', () => {
   it('Should fit 2*sin(3*t)', () => {
@@ -61,20 +44,25 @@ describe('Example problems', () => {
     const actual = levenbergMarquardt(data, getFunction, options);
     expect(actual.parameterValues).toBeDeepCloseTo(exactParameters, 1);
   });
-});
 
-test('Bennet5 problem', () => {
-  const options = {
-    damping: 0.00001,
-    maxIterations: 1000,
-    errorTolerance: 1e-3,
-    minValues: [1, 1, 1],
-    maxValues: [11, 11, 11],
-    initialValues: [3.5, 3.8, 4]
-  };
+  it('Should fit bennet5([2, 3, 5])', () => {
+    const getFunction = ([b1, b2, b3]) => (t => b1 * Math.pow(t + b2, -1 / b3));
+    const n = 154;
+    const xs = new Array(n).fill(0).map((zero, i) => -2.9 + i * (53 + 2.9) / (n - 1)); // [-2.9, ..., 53].length = n
+    const exactParameters = [2, 3, 5];
+    const data = {
+      x: xs,
+      y: xs.map(getFunction(exactParameters))
+    };
 
-  let result = levenbergMarquardt(bennet5Data, bennet5, options);
-  expect(result.parameterValues).toBeDeepCloseTo(bennett5Parameter, 3);
+    const options = {
+      minValues: [1, 3 + 1e-15, 1],
+      maxValues: [11, 11, 11],
+      initialValues: [3.5, 3.8, 4]
+    };
+    const actual = levenbergMarquardt(data, getFunction, options);
+    expect(actual.parameterValues).toBeDeepCloseTo(exactParameters, 3);
+  });
 });
 
 test('fourParamEq', () => {

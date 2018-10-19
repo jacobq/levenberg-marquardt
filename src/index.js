@@ -104,7 +104,8 @@ export default function levenbergMarquardt(
 
     let residuals2 = sumOfSquaredResiduals(data, params2, paramFunction);
 
-    if (isNaN(residuals2)) throw new Error(`The function evaluated to NaN.\r\n  f = ${paramFunction(params2).toString()}\r\n  p = ${params2}\r\n  x = ${data.x}`);
+    if (isNaN(residuals2)) throw Error(`The function evaluated to NaN.\r\n  f = ${paramFunction(params2).toString()}\r\n  p = ${params2}\r\n  x = ${data.x}\r\n  y = ${data.y}\r\n  residuals2 = ${residuals2}`);
+    if (!isFinite(residuals2)) throw Error(`The function did not produce a finite result.\r\n  f = ${paramFunction(params2).toString()}\r\n  p = ${params2}\r\n  x = ${data.x}\r\n  y = ${data.y}\r\n  residuals2 = ${residuals2}`);
 
     if (residuals2 < residuals) {
       params = params2;
