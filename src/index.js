@@ -78,18 +78,15 @@ export default function levenbergMarquardt(
 
   initializeErrorPropagation(errorPropagation);
 
-  /** @type Array<number> */
-  let residualDifferences = Array(10).fill(NaN);
+  const numberOfResidualsToConsider = 10;
+  let residualDifferences = Array(numberOfResidualsToConsider).fill(NaN);
 
   let residuals = sumOfSquaredResiduals(data, params, paramFunction);
   let converged = false;
 
-  for (
-    var iteration = 0;
-    iteration < maxIterations && !converged;
-    iteration++
-  ) {
-    var params2 = step(
+  let iteration = 0;
+  while (iteration < maxIterations && !converged) {
+    let params2 = step(
       data,
       params,
       damping,
@@ -120,8 +117,10 @@ export default function levenbergMarquardt(
     damping = Math.max( minDamping, Math.min(maxDamping, damping) );
 
     residualDifferences.shift();
-    residualDifferences.push( residuals - residuals2 );
-    converged = residualDifferences.reduce((a, b) => Math.max(a, b)) <= residualEpsilon;
+    residualDifferences.push( Math.abs(residuals - residuals2) );
+    const maxEpsilon = residualDifferences.reduce((a, b) => Math.max(a, b));
+    converged = maxEpsilon <= residualEpsilon;
+    iteration++;
   }
 
   /** @type {Result} */

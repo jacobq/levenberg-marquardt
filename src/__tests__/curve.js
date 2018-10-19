@@ -1,6 +1,7 @@
 import { toBeDeepCloseTo } from 'jest-matcher-deep-close-to';
 
 import levenbergMarquardt from '..';
+import * as errCalc from "../errorCalculation";
 
 expect.extend({ toBeDeepCloseTo });
 
@@ -38,7 +39,31 @@ const bennet5Data = {
   y: bennett5YData
 };
 
-test('bennet5 problem', () => {
+
+
+describe('Example problems', () => {
+  it('Should fit 2*sin(3*t)', () => {
+    const getFunction = ([a, b]) => (t => a * Math.sin(b * t));
+    const n = 50;
+    const xs = new Array(n).fill(0).map((zero, i) => (i * 2 * Math.PI) / (n - 1)); // [0, ..., 2pi].length = n
+    const exactParameters = [2, 3];
+    const data = {
+      x: xs,
+      y: xs.map(getFunction(exactParameters))
+    };
+
+    const options = {
+      maxIterations: 100,
+      residualEpsilon: 0, // force maximum iterations
+      damping: 0.1,
+      initialValues: [1, 1]
+    };
+    const actual = levenbergMarquardt(data, getFunction, options);
+    expect(actual.parameterValues).toBeDeepCloseTo(exactParameters, 1);
+  });
+});
+
+test('Bennet5 problem', () => {
   const options = {
     damping: 0.00001,
     maxIterations: 1000,
@@ -54,7 +79,7 @@ test('bennet5 problem', () => {
 
 test('fourParamEq', () => {
   const options = {
-    damping: 0.001,
+    damping: 0.0001,
     maxIterations: 200,
     minValues: [-Infinity, -Infinity, 0, -Infinity],
     initialValues: [0, 100, 1, 0.1]
@@ -63,14 +88,14 @@ test('fourParamEq', () => {
   // TODO: Document where these values come from / why they are correct
   expect(levenbergMarquardt(data, fourParamEq, options)).toBeDeepCloseTo({
     parameterValues: [
-      -31.796746265972978,
-      143.170298900432,
-      0.000001983487779732099,
-      0.2744342546252607
+      -32.0049530120509,
+      143.62056670443766,
+      1.8538886934094637e-7,
+      0.2715460299471644
     ],
-    residuals: 6810.461467877944,
-    iterations: 10,
-    parameterError: 6810.461467877944
+    residuals: 2913.145671022668,
+    iterations: 200,
+    parameterError: 2913.145671022668
   }, 3);
 });
 
