@@ -1,4 +1,5 @@
 import { inverse, Matrix } from 'ml-matrix';
+
 import { pointWeights } from './errorCalculation';
 
 /**

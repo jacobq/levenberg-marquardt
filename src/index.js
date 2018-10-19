@@ -122,7 +122,6 @@ export default function levenbergMarquardt(
     residualDifferences.shift();
     residualDifferences.push( residuals - residuals2 );
     converged = residualDifferences.reduce((a, b) => Math.max(a, b)) <= residualEpsilon;
-
   }
 
   /** @type {Result} */

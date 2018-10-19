@@ -86,16 +86,12 @@ export function pointWeights(
   const errs = new Array(m);
 
   if (!data.xError) {
-
     if (!data.yError) {
       return errs.fill(1);
-
     } else {
       errs.splice(0, m, ...data.yError);
     }
-
   } else {
-
     const fn = paramFunction(params);
     var point;
 
